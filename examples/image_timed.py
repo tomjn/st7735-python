@@ -24,14 +24,23 @@ import ST7735 as TFT
 import Adafruit_GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
 
+import sys
 
-WIDTH = 128
-HEIGHT = 160
-SPEED_HZ = 4000000
+if len(sys.argv) < 2:
+    print("Usage: {} <image_file>".format(sys.argv[0]))
+    sys.exit(1)
+
+image_file = sys.argv[1]
+
+
+
+WIDTH = 160
+HEIGHT = 80
+SPEED_HZ = 16000000
 
 
 # Raspberry Pi configuration.
-DC = 24
+DC = 5
 RST = 25
 SPI_PORT = 0
 SPI_DEVICE = 0
@@ -56,10 +65,10 @@ disp.begin()
 
 # Load an image.
 print('Loading image...')
-image = Image.open('cat.jpg')
+image = Image.open(image_file)
 
 # Resize the image and rotate it so matches the display.
-image = image.rotate(90).resize((WIDTH, HEIGHT))
+image = image.rotate(0).resize((WIDTH, HEIGHT))
 
 print('Press Ctrl-C to exit')
 while(True):
@@ -69,5 +78,5 @@ while(True):
     disp.display(image)
     end_time = time.time()
     print('Time to draw image: ' + str(end_time - start_time))
-    disp.clear((0, 0, 0))
-    disp.display()
+    # disp.clear((0, 0, 0))
+    # disp.display()
