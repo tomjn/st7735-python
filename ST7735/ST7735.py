@@ -30,12 +30,12 @@ import Adafruit_GPIO.SPI as SPI
 
 
 # SPI_CLOCK_HZ = 64000000 # 64 MHz
-SPI_CLOCK_HZ = 4000000 # 4 MHz
+SPI_CLOCK_HZ = 16000000 # 4 MHz
 
 
 # Constants for interacting with display registers.
-ST7735_TFTWIDTH    = 128
-ST7735_TFTHEIGHT   = 160
+ST7735_TFTWIDTH    = 160 # 128
+ST7735_TFTHEIGHT   = 80 #64 #160
 
 ST7735_NOP         = 0x00
 ST7735_SWRESET     = 0x01
@@ -116,7 +116,7 @@ def image_to_data(image):
     """Generator function to convert a PIL image to 16-bit 565 RGB bytes."""
     # NumPy is much faster at doing this. NumPy code provided by:
     # Keith (https://www.blogger.com/profile/02555547344016007163)
-    pb = np.array(image.convert('RGB')).astype('uint16')
+    pb = np.rot90(np.array(image.convert('RGB')), 1).astype('uint16')
     color = ((pb[:,:,0] & 0xF8) << 8) | ((pb[:,:,1] & 0xFC) << 3) | (pb[:,:,2] >> 3)
     return np.dstack(((color >> 8) & 0xFF, color & 0xFF)).flatten().tolist()
 
@@ -235,7 +235,7 @@ class ST7735(object):
         self.command(ST7735_VMCTR1) # Power control
         self.data(0x0E)
         
-        self.command(ST7735_INVOFF) # Don't invert display
+        self.command(ST7735_INVON) # Don't invert display
         
         self.command(ST7735_MADCTL) # Memory access control (directions)
         self.data(0xC8) # row addr/col addr, bottom to top refresh
@@ -247,15 +247,15 @@ class ST7735(object):
         
         self.command(ST7735_CASET) # Column addr set
         self.data(0x00) # XSTART = 0
-        self.data(0x00)
+        self.data(132 - ST7735_TFTHEIGHT)
         self.data(0x00) # XEND = 127
-        self.data(0x7F)
+        self.data(ST7735_TFTHEIGHT - 1)
         
         self.command(ST7735_RASET) # Row addr set
         self.data(0x00) # XSTART = 0
-        self.data(0x00)
+        self.data(161 - ST7735_TFTWIDTH)
         self.data(0x00) # XEND = 159
-        self.data(0x9F)
+        self.data(ST7735_TFTWIDTH - 1)
         
         #
         
@@ -319,16 +319,25 @@ class ST7735(object):
             x1 = self.width-1
         if y1 is None:
             y1 = self.height-1
+
+        #y0 += 132 - 80
+        #y1 += 132 - 80
+        y0 += 26
+        y1 += 26
+
+        x0 += 1
+        x1 += 1
+
         self.command(ST7735_CASET)        # Column addr set
-        self.data(x0 >> 8)
-        self.data(x0)                    # XSTART
-        self.data(x1 >> 8)
-        self.data(x1)                    # XEND
-        self.command(ST7735_RASET)        # Row addr set
         self.data(y0 >> 8)
-        self.data(y0)                    # YSTART
+        self.data(y0)                    # XSTART
         self.data(y1 >> 8)
-        self.data(y1)                    # YEND
+        self.data(y1)                    # XEND
+        self.command(ST7735_RASET)        # Row addr set
+        self.data(x0 >> 8)
+        self.data(x0)                    # YSTART
+        self.data(x1 >> 8)
+        self.data(x1)                    # YEND
         self.command(ST7735_RAMWR)        # write to RAM
 
     def display(self, image=None):
