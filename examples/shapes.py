@@ -23,18 +23,16 @@ from PIL import ImageDraw
 from PIL import ImageFont
 
 import ST7735 as TFT
-import Adafruit_GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
 
 
-WIDTH = 128
-HEIGHT = 160
+WIDTH = 160
+HEIGHT = 80
 SPEED_HZ = 4000000
 
 
 # Raspberry Pi configuration.
-DC = 24
-RST = 25
+DC = 5
 SPI_PORT = 0
 SPI_DEVICE = 0
 
@@ -47,7 +45,6 @@ SPI_DEVICE = 0
 # Create TFT LCD display class.
 disp = TFT.ST7735(
     DC,
-    rst=RST,
     spi=SPI.SpiDev(
         SPI_PORT,
         SPI_DEVICE,
@@ -66,19 +63,19 @@ disp.clear((255, 0, 0))
 # Get a PIL Draw object to start drawing on the display buffer.
 draw = disp.draw()
 
+# Draw a purple rectangle with yellow outline.
+draw.rectangle((10, 10, WIDTH-10, HEIGHT-10), outline=(255,255,0), fill=(255,0,255))
+
 # Draw some shapes.
 # Draw a blue ellipse with a green outline.
-draw.ellipse((10, 10, 110, 80), outline=(0,255,0), fill=(0,0,255))
-
-# Draw a purple rectangle with yellow outline.
-draw.rectangle((10, 90, 110, 160), outline=(255,255,0), fill=(255,0,255))
+draw.ellipse((10, 10, WIDTH-10, HEIGHT-10), outline=(0,255,0), fill=(0,0,255))
 
 # Draw a white X.
-draw.line((10, 170, 110, 230), fill=(255,255,255))
-draw.line((10, 230, 110, 170), fill=(255,255,255))
+draw.line((10, 10, WIDTH-10, HEIGHT-10), fill=(255,255,255))
+draw.line((10, HEIGHT-10, WIDTH-10, 10), fill=(255,255,255))
 
 # Draw a cyan triangle with a black outline.
-draw.polygon([(10, 275), (110, 240), (110, 310)], outline=(0,0,0), fill=(0,255,255))
+draw.polygon([(WIDTH/2, 10), (WIDTH-10, HEIGHT-10), (10, HEIGHT-10)], outline=(0,0,0), fill=(0,255,255))
 
 # Load default font.
 font = ImageFont.load_default()
@@ -105,8 +102,8 @@ def draw_rotated_text(image, text, position, angle, font, fill=(255,255,255)):
     image.paste(rotated, position, rotated)
 
 # Write two lines of white text on the buffer, rotated 90 degrees counter clockwise.
-draw_rotated_text(disp.buffer, 'Hello World!', (150, 120), 90, font, fill=(255,255,255))
-draw_rotated_text(disp.buffer, 'This is a line of text.', (170, 90), 90, font, fill=(255,255,255))
+draw_rotated_text(disp.buffer, 'Hello World!', (0, 0), 90, font, fill=(255,255,255))
+draw_rotated_text(disp.buffer, 'This is a line of text.', (10, HEIGHT-10), 0, font, fill=(255,255,255))
 
 # Write buffer to display hardware, must be called to make things visible on the
 # display!

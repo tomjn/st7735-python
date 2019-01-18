@@ -21,18 +21,24 @@
 from PIL import Image
 
 import ST7735 as TFT
-import Adafruit_GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
+import time
 
+import sys
 
-WIDTH = 128
-HEIGHT = 160
+if len(sys.argv) < 2:
+    print("Usage: {} <image_file>".format(sys.argv[0]))
+    sys.exit(1)
+
+image_file = sys.argv[1]
+
+WIDTH = TFT.ST7735_TFTWIDTH
+HEIGHT = TFT.ST7735_TFTHEIGHT
 SPEED_HZ = 4000000
 
 
 # Raspberry Pi configuration.
-DC = 24
-RST = 25
+DC = 5
 SPI_PORT = 0
 SPI_DEVICE = 0
 
@@ -45,7 +51,6 @@ SPI_DEVICE = 0
 # Create TFT LCD display class.
 disp = TFT.ST7735(
     DC,
-    rst=RST,
     spi=SPI.SpiDev(
         SPI_PORT,
         SPI_DEVICE,
@@ -55,12 +60,14 @@ disp = TFT.ST7735(
 disp.begin()
 
 # Load an image.
-print('Loading image...')
-image = Image.open('cat.jpg')
+print('Loading image: {}...'.format(image_file))
+image = Image.open(image_file)
 
 # Resize the image and rotate it so matches the display.
-image = image.rotate(90).resize((WIDTH, HEIGHT))
+# image = image.rotate(90).resize((WIDTH, HEIGHT))
+image = image.resize((WIDTH, HEIGHT))
 
 # Draw the image on the display hardware.
 print('Drawing image')
+
 disp.display(image)

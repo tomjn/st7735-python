@@ -1,5 +1,5 @@
 # Copyright (c) 2014 Adafruit Industries
-# Author: Tony DiCola
+# Author: Phil Howard, Tony DiCola
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,37 +19,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 from PIL import Image
-import time
 import ST7735 as TFT
-import Adafruit_GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
-
+import time
 import sys
-
-if len(sys.argv) < 2:
-    print("Usage: {} <image_file>".format(sys.argv[0]))
-    sys.exit(1)
 
 image_file = sys.argv[1]
 
-
-
-WIDTH = 160
-HEIGHT = 80
-SPEED_HZ = 16000000
-
+WIDTH = TFT.ST7735_TFTWIDTH
+HEIGHT = TFT.ST7735_TFTHEIGHT
+SPEED_HZ = 4000000
 
 # Raspberry Pi configuration.
 DC = 5
 RST = 25
 SPI_PORT = 0
 SPI_DEVICE = 0
-
-# BeagleBone Black configuration.
-#DC = 'P9_15'
-#RST = 'P9_12'
-#SPI_PORT = 1
-#SPI_DEVICE = 0
 
 # Create TFT LCD display class.
 disp = TFT.ST7735(
@@ -64,19 +49,19 @@ disp = TFT.ST7735(
 disp.begin()
 
 # Load an image.
-print('Loading image...')
+print('Loading gif: {}...'.format(image_file))
 image = Image.open(image_file)
 
-# Resize the image and rotate it so matches the display.
-image = image.rotate(0).resize((WIDTH, HEIGHT))
+print('Drawing gif')
 
-print('Press Ctrl-C to exit')
-while(True):
-    # Draw the image on the display hardware.
-    print('Drawing image')
-    start_time = time.time()
-    disp.display(image)
-    end_time = time.time()
-    print('Time to draw image: ' + str(end_time - start_time))
-    # disp.clear((0, 0, 0))
-    # disp.display()
+frame = 0
+
+while True:
+    try:
+        image.seek(frame)
+        disp.display(image.resize((WIDTH, HEIGHT)))
+        frame += 1
+        time.sleep(0.05)
+    except EOFError:
+        frame = 0
+    
