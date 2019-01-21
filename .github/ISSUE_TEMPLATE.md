@@ -1,9 +1,9 @@
-Thank you for opening an issue on an Adafruit Python library repository.  To
+Thank you for opening an issue on an Pimoroni Python library repository.  To
 improve the speed of resolution please review the following guidelines and
 common troubleshooting steps below before creating the issue:
 
 - **Do not use GitHub issues for troubleshooting projects and issues.**  Instead use
-  the forums at http://forums.adafruit.com to ask questions and troubleshoot why
+  the forums at http://forums.pimoroni.com to ask questions and troubleshoot why
   something isn't working as expected.  In many cases the problem is a common issue
   that you will more quickly receive help from the forum community.  GitHub issues
   are meant for known defects in the code.  If you don't know if there is a defect
