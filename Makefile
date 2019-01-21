@@ -1,8 +1,8 @@
 .PHONY: usage install uninstall
 usage:
 	@echo "Usage: make <target>, where target is one of:\n"
-	@echo "install:       install the library locally from source"
-	@echo "uninstall:     uninstall the local library"
+	@echo "install:	   install the library locally from source"
+	@echo "uninstall:	 uninstall the local library"
 	@echo "python-readme: generate library/README.rst from README.md"
 	@echo "python-wheels: build python .whl files for distribution"
 	@echo "python-sdist:  build python source distribution"
@@ -42,3 +42,6 @@ python-dist: python-clean python-wheels python-sdist
 
 python-deploy: python-dist
 	twine upload library/dist/*
+
+python-deploy-test: python-dist
+	twine upload --repository-url https://test.pypi.org/legacy/ library/dist/*
