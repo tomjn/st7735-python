@@ -5,30 +5,17 @@ Python library to control an ST7735 TFT LCD display.  Allows simple drawing on t
 
 Designed specifically to work with a ST7735 based 160x80 pixel TFT SPI display. (Specifically the 0.96" SPI LCD from Pimoroni).
 
-For all platforms (Raspberry Pi and Beaglebone Black) make sure you have the following dependencies:
+Make sure you have the following dependencies:
 
 ````
 sudo apt-get update
-sudo apt-get install build-essential python-dev python-smbus python-pip python-imaging python-numpy
+sudo apt-get install python-rpi.gpio python-spidev python-pip python-imaging python-numpy
 ````
 
-For a Raspberry Pi make sure you have the RPi.GPIO and Adafruit GPIO libraries by executing:
+Install this library by running:
 
 ````
-sudo pip install RPi.GPIO
-sudo pip install Adafruit_GPIO
-````
-
-For a BeagleBone Black make sure you have the Adafruit_BBIO library by executing:
-
-````
-sudo pip install Adafruit_BBIO
-````
-
-Install the library by downloading with the download link on the right, unzipping the archive, navigating inside the library's directory and executing:
-
-````
-sudo python setup.py install
+sudo pip install st7735
 ````
 
 See example of usage in the examples folder.
