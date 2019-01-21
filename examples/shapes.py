@@ -18,15 +18,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-import signal
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 
 import ST7735
 
-WIDTH = ST7735.ST7735_TFTWIDTH
-HEIGHT = ST7735.ST7735_TFTHEIGHT
 
 # Create ST7735 LCD display class.
 disp = ST7735.ST7735(
@@ -34,21 +31,23 @@ disp = ST7735.ST7735(
     cs=0,
     dc=24,
     backlight=18,
+    rotation=90,
     spi_speed_hz=4000000
 )
 
 # Initialize display.
 disp.begin()
 
+WIDTH = disp.width
+HEIGHT = disp.height
+
+
 # Clear the display to a red background.
 # Can pass any tuple of red, green, blue values (from 0 to 255 each).
-disp.clear((255, 0, 0))
-
-# Alternatively can clear to a black screen by calling:
-# disp.clear()
-
 # Get a PIL Draw object to start drawing on the display buffer.
-draw = disp.draw()
+img = Image.new('RGB', (WIDTH, HEIGHT), color=(255, 0, 0))
+
+draw = ImageDraw.Draw(img)
 
 # Draw a purple rectangle with yellow outline.
 draw.rectangle((10, 10, WIDTH-10, HEIGHT-10), outline=(255,255,0), fill=(255,0,255))
@@ -89,12 +88,9 @@ def draw_rotated_text(image, text, position, angle, font, fill=(255,255,255)):
     image.paste(rotated, position, rotated)
 
 # Write two lines of white text on the buffer, rotated 90 degrees counter clockwise.
-draw_rotated_text(disp.buffer, 'Hello World!', (0, 0), 90, font, fill=(255,255,255))
-draw_rotated_text(disp.buffer, 'This is a line of text.', (10, HEIGHT-10), 0, font, fill=(255,255,255))
+draw_rotated_text(img, 'Hello World!', (0, 0), 90, font, fill=(255,255,255))
+draw_rotated_text(img, 'This is a line of text.', (10, HEIGHT-10), 0, font, fill=(255,255,255))
 
 # Write buffer to display hardware, must be called to make things visible on the
 # display!
-disp.display()
-
-print("Press Ctl+C to exit!")
-signal.pause()
+disp.display(img)

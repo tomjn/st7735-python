@@ -21,22 +21,19 @@
 import numbers
 import time
 import numpy as np
-import atexit
 
 import spidev
 import RPi.GPIO as GPIO
 
-from PIL import Image
-from PIL import ImageDraw
-
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BCM)
 
 SPI_CLOCK_HZ = 16000000 # 4 MHz
 
 # Constants for interacting with display registers.
-ST7735_TFTWIDTH    = 160
-ST7735_TFTHEIGHT   = 80
+ST7735_TFTWIDTH    = 80
+ST7735_TFTHEIGHT   = 160
+
+ST7735_COLS        = 132
+ST7735_ROWS        = 162
 
 ST7735_NOP         = 0x00
 ST7735_SWRESET     = 0x01
@@ -113,11 +110,11 @@ def color565(r, g, b):
     """
     return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
 
-def image_to_data(image):
+def image_to_data(image, rotation=0):
     """Generator function to convert a PIL image to 16-bit 565 RGB bytes."""
     # NumPy is much faster at doing this. NumPy code provided by:
     # Keith (https://www.blogger.com/profile/02555547344016007163)
-    pb = np.rot90(np.array(image.convert('RGB')), 1).astype('uint16')
+    pb = np.rot90(np.array(image.convert('RGB')), rotation // 90).astype('uint16')
     color = ((pb[:,:,0] & 0xF8) << 8) | ((pb[:,:,1] & 0xFC) << 3) | (pb[:,:,2] >> 3)
     return np.dstack(((color >> 8) & 0xFF, color & 0xFF)).flatten().tolist()
 
@@ -125,15 +122,29 @@ class ST7735(object):
     """Representation of an ST7735 TFT LCD."""
 
     def __init__(self, port, cs, dc, backlight=None, rst=None, width=ST7735_TFTWIDTH,
-        height=ST7735_TFTHEIGHT, spi_speed_hz=4000000):
+        height=ST7735_TFTHEIGHT, rotation=90, offset_left=None, offset_top=None, invert=True, spi_speed_hz=4000000):
         """Create an instance of the display using SPI communication.  Must
         provide the GPIO pin number for the D/C pin and the SPI driver.  Can
         optionally provide the GPIO pin number for the reset pin as the rst
         parameter.
 
         :param port: SPI port number
-        :param cs: SPI CS number (0 or 1 for BCM
+        :param cs: SPI chip-select number (0 or 1 for BCM
+        :param backlight: Pin for controlling backlight
+        :param rst: Reset pin for ST7735
+        :param width: Width of display connected to ST7735
+        :param height: Height of display connected to ST7735
+        :param rotation: Rotation of display connected to ST7735
+        :param offset_left: COL offset in ST7735 memory
+        :param offset_top: ROW offset in ST7735 memory
+        :param invert: Invert display
+        :param spi_speed_hz: SPI speed (in Hz)
+
         """
+
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)
+
         self._spi = spidev.SpiDev(port, cs)
         self._spi.mode = 0
         self._spi.lsbfirst = False
@@ -141,8 +152,22 @@ class ST7735(object):
 
         self._dc = dc
         self._rst = rst
-        self.width = width
-        self.height = height
+        self._width = width
+        self._height = height
+        self._rotation = rotation
+        self._invert = invert
+
+        # Default left offset to center display
+        if offset_left is None:
+            offset_left = (ST7735_COLS - width) // 2
+
+        self._offset_left = offset_left
+
+        # Default top offset to center display
+        if offset_top is None:
+            offset_top = (ST7735_ROWS - height) // 2
+
+        self._offset_top = offset_top
 
         # Set DC as output.
         GPIO.setup(dc, GPIO.OUT)
@@ -155,8 +180,6 @@ class ST7735(object):
         if rst is not None:
             GPIO.setup(rst, GPIO.OUT)
 
-        # Create an image buffer.
-        self.buffer = Image.new('RGB', (width, height))
 
     def send(self, data, is_data=True, chunk_size=4096):
         """Write a byte or array of bytes to the display. Is_data parameter
@@ -173,6 +196,14 @@ class ST7735(object):
         for start in range(0, len(data), chunk_size):
             end = min(start+chunk_size, len(data))
             self._spi.xfer(data[start:end])
+
+    @property
+    def width(self):
+        return self._width if self._rotation == 0 or self._rotation == 180 else self._height
+
+    @property
+    def height(self):
+        return self._height if self._rotation == 0 or self._rotation == 180 else self._width
 
     def command(self, data):
         """Write a byte or array of bytes to the display as command data."""
@@ -243,7 +274,10 @@ class ST7735(object):
         self.command(ST7735_VMCTR1)     # Power control
         self.data(0x0E)
         
-        self.command(ST7735_INVON)      # Don't invert display
+        if self._invert:
+            self.command(ST7735_INVON)  # Invert display
+        else:
+            self.command(ST7735_INVOFF) # Don't invert display
         
         self.command(ST7735_MADCTL)     # Memory access control (directions)
         self.data(0xC8)                 # row addr/col addr, bottom to top refresh
@@ -254,15 +288,15 @@ class ST7735(object):
         
         self.command(ST7735_CASET)      # Column addr set
         self.data(0x00)                 # XSTART = 0
-        self.data(132 - ST7735_TFTHEIGHT)
-        self.data(0x00)                 # XEND = 127
-        self.data(ST7735_TFTHEIGHT - 1)
+        self.data(self._offset_left)
+        self.data(0x00)                 # XEND = ROWS - height
+        self.data(self._width + self._offset_left - 1)
         
         self.command(ST7735_RASET)      # Row addr set
         self.data(0x00)                 # XSTART = 0
-        self.data(161 - ST7735_TFTWIDTH)
-        self.data(0x00)                 # XEND = 159
-        self.data(ST7735_TFTWIDTH - 1)
+        self.data(self._offset_top)
+        self.data(0x00)                 # XEND = COLS - width
+        self.data(self._height + self._offset_top - 1)
         
         
         self.command(ST7735_GMCTRP1)    # Set Gamma
@@ -313,7 +347,6 @@ class ST7735(object):
         """
         self.reset()
         self._init()
-        atexit.register(self.clear_on_exit)
 
     def set_window(self, x0=0, y0=0, x1=None, y1=None):
         """Set the pixel address window for proceeding drawing commands. x0 and
@@ -323,59 +356,42 @@ class ST7735(object):
         to width-1,height-1.
         """
         if x1 is None:
-            x1 = self.width-1
+            x1 = self._width-1
 
         if y1 is None:
-            y1 = self.height-1
+            y1 = self._height-1
 
-        y0 += 26
-        y1 += 26
+        y0 += self._offset_top
+        y1 += self._offset_top
 
-        x0 += 1
-        x1 += 1
+        x0 += self._offset_left
+        x1 += self._offset_left
 
         self.command(ST7735_CASET)       # Column addr set
-        self.data(y0 >> 8)
-        self.data(y0)                    # XSTART
-        self.data(y1 >> 8)
-        self.data(y1)                    # XEND
-        self.command(ST7735_RASET)       # Row addr set
         self.data(x0 >> 8)
-        self.data(x0)                    # YSTART
+        self.data(x0)                    # XSTART
         self.data(x1 >> 8)
-        self.data(x1)                    # YEND
+        self.data(x1)                    # XEND
+        self.command(ST7735_RASET)       # Row addr set
+        self.data(y0 >> 8)
+        self.data(y0)                    # YSTART
+        self.data(y1 >> 8)
+        self.data(y1)                    # YEND
         self.command(ST7735_RAMWR)       # write to RAM
 
-    def display(self, image=None):
-        """Write the display buffer or provided image to the hardware.  If no
-        image parameter is provided the display buffer will be written to the
-        hardware.  If an image is provided, it should be RGB format and the
-        same dimensions as the display hardware.
+    def display(self, image):
+        """Write the provided image to the hardware.
+
+        :param image: Should be RGB format and the same dimensions as the display hardware.
+
         """
-        # By default write the internal buffer to the display.
-        if image is None:
-            image = self.buffer
         # Set address bounds to entire display.
         self.set_window()
         # Convert image to array of 16bit 565 RGB data bytes.
         # Unfortunate that this copy has to occur, but the SPI byte writing
         # function needs to take an array of bytes and PIL doesn't natively
         # store images in 16-bit 565 RGB format.
-        pixelbytes = list(image_to_data(image))
+        pixelbytes = list(image_to_data(image, self._rotation))
         # Write data to hardware.
         self.data(pixelbytes)
-
-    def clear(self, color=(0,0,0)):
-        """Clear the image buffer to the specified RGB color (default black)."""
-        width, height = self.buffer.size
-        self.buffer.putdata([color]*(width*height))
-
-    def draw(self):
-        """Return a PIL ImageDraw instance for 2D drawing on the image buffer."""
-        return ImageDraw.Draw(self.buffer)
-
-    def clear_on_exit(self):
-        self.clear()
-        self.display()
-
 

@@ -20,7 +20,6 @@
 # THE SOFTWARE.
 import time
 import sys
-import signal
 
 from PIL import Image
 import ST7735 as ST7735
@@ -31,17 +30,20 @@ if len(sys.argv) < 2:
 
 image_file = sys.argv[1]
 
-WIDTH = ST7735.ST7735_TFTWIDTH
-HEIGHT = ST7735.ST7735_TFTHEIGHT
-
 # Create ST7735 LCD display class.
 disp = ST7735.ST7735(
     port=0,
     cs=0,
     dc=24,
     backlight=18,
+    rotation=90,
     spi_speed_hz=4000000
 )
+
+WIDTH = disp.width
+HEIGHT = disp.height
+
+print(WIDTH, HEIGHT)
 
 # Initialize display.
 disp.begin()
@@ -50,14 +52,10 @@ disp.begin()
 print('Loading image: {}...'.format(image_file))
 image = Image.open(image_file)
 
-# Resize the image and rotate it so matches the display.
-# image = image.rotate(90).resize((WIDTH, HEIGHT))
+# Resize the image
 image = image.resize((WIDTH, HEIGHT))
 
 # Draw the image on the display hardware.
 print('Drawing image')
 
 disp.display(image)
-
-print("Press Ctl+C to exit!")
-signal.pause()
