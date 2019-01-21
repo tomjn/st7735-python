@@ -19,31 +19,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 from PIL import Image
-import ST7735 as TFT
-import Adafruit_GPIO.SPI as SPI
+import ST7735
 import time
 import sys
 
-image_file = sys.argv[1]
+if len(sys.argv) > 1:
+    image_file = sys.argv[1]
+else:
+    print("Usage: {} <filename.gif>".format(sys.argv[0]))
+    sys.exit(0)
 
-WIDTH = TFT.ST7735_TFTWIDTH
-HEIGHT = TFT.ST7735_TFTHEIGHT
-SPEED_HZ = 4000000
-
-# Raspberry Pi configuration.
-DC = 5
-RST = 25
-SPI_PORT = 0
-SPI_DEVICE = 0
+WIDTH = ST7735.ST7735_TFTWIDTH
+HEIGHT = ST7735.ST7735_TFTHEIGHT
 
 # Create TFT LCD display class.
-disp = TFT.ST7735(
-    DC,
-    rst=RST,
-    spi=SPI.SpiDev(
-        SPI_PORT,
-        SPI_DEVICE,
-        max_speed_hz=SPEED_HZ))
+disp = ST7735.ST7735(
+    port=0,
+    cs=0,
+    dc=24,
+    backlight=18,
+    spi_speed_hz=4000000
+)
 
 # Initialize display.
 disp.begin()
@@ -52,7 +48,7 @@ disp.begin()
 print('Loading gif: {}...'.format(image_file))
 image = Image.open(image_file)
 
-print('Drawing gif')
+print('Drawing gif, press Ctrl+C to exit!')
 
 frame = 0
 

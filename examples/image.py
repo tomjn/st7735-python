@@ -18,13 +18,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-from PIL import Image
-
-import ST7735 as TFT
-import Adafruit_GPIO.SPI as SPI
 import time
-
 import sys
+import signal
+
+from PIL import Image
+import ST7735 as ST7735
 
 if len(sys.argv) < 2:
     print("Usage: {} <image_file>".format(sys.argv[0]))
@@ -32,29 +31,17 @@ if len(sys.argv) < 2:
 
 image_file = sys.argv[1]
 
-WIDTH = TFT.ST7735_TFTWIDTH
-HEIGHT = TFT.ST7735_TFTHEIGHT
-SPEED_HZ = 4000000
+WIDTH = ST7735.ST7735_TFTWIDTH
+HEIGHT = ST7735.ST7735_TFTHEIGHT
 
-
-# Raspberry Pi configuration.
-DC = 5
-SPI_PORT = 0
-SPI_DEVICE = 0
-
-# BeagleBone Black configuration.
-# DC = 'P9_15'
-# RST = 'P9_12'
-# SPI_PORT = 1
-# SPI_DEVICE = 0
-
-# Create TFT LCD display class.
-disp = TFT.ST7735(
-    DC,
-    spi=SPI.SpiDev(
-        SPI_PORT,
-        SPI_DEVICE,
-        max_speed_hz=SPEED_HZ))
+# Create ST7735 LCD display class.
+disp = ST7735.ST7735(
+    port=0,
+    cs=0,
+    dc=24,
+    backlight=18,
+    spi_speed_hz=4000000
+)
 
 # Initialize display.
 disp.begin()
@@ -71,3 +58,6 @@ image = image.resize((WIDTH, HEIGHT))
 print('Drawing image')
 
 disp.display(image)
+
+print("Press Ctl+C to exit!")
+signal.pause()

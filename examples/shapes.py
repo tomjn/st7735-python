@@ -18,37 +18,24 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+import signal
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 
-import ST7735 as TFT
-import Adafruit_GPIO.SPI as SPI
+import ST7735
 
+WIDTH = ST7735.ST7735_TFTWIDTH
+HEIGHT = ST7735.ST7735_TFTHEIGHT
 
-WIDTH = 160
-HEIGHT = 80
-SPEED_HZ = 4000000
-
-
-# Raspberry Pi configuration.
-DC = 5
-SPI_PORT = 0
-SPI_DEVICE = 0
-
-# BeagleBone Black configuration.
-# DC = 'P9_15'
-# RST = 'P9_12'
-# SPI_PORT = 1
-# SPI_DEVICE = 0
-
-# Create TFT LCD display class.
-disp = TFT.ST7735(
-    DC,
-    spi=SPI.SpiDev(
-        SPI_PORT,
-        SPI_DEVICE,
-        max_speed_hz=SPEED_HZ))
+# Create ST7735 LCD display class.
+disp = ST7735.ST7735(
+    port=0,
+    cs=0,
+    dc=24,
+    backlight=18,
+    spi_speed_hz=4000000
+)
 
 # Initialize display.
 disp.begin()
@@ -108,3 +95,6 @@ draw_rotated_text(disp.buffer, 'This is a line of text.', (10, HEIGHT-10), 0, fo
 # Write buffer to display hardware, must be called to make things visible on the
 # display!
 disp.display()
+
+print("Press Ctl+C to exit!")
+signal.pause()
