@@ -24,8 +24,32 @@ Install this library by running:
 
 See example of usage in the examples folder.
 
-Pimoroni invests time and resources forking and slightly modifying this
-open source code, please support Pimoroni and open-source software by
+Licensing & History
+===================
+
+This library is a modification of a modification of code originally
+written by Tony DiCola for Adafruit Industries, and modified to work
+with the ST7735 by Clement Skau.
+
+It has been modified by Pimoroni to include support for their 160x80 SPI
+LCD breakout, and hopefully also generalised enough so that it will
+support other ST7735-powered displays.
+
+Modifications include:
+----------------------
+
+-  PIL/Pillow has been removed from the underlying display driver to
+   separate concerns- you should create your own PIL image and display
+   it using ``display(image)``
+-  ``width``, ``height``, ``rotation``, ``invert``, ``offset_left`` and
+   ``offset_top`` parameters can be passed into ``__init__`` for
+   alternate displays
+-  ``Adafruit_GPIO`` has been replaced with ``RPi.GPIO`` and ``spidev``
+   to closely align with our other software (IE: Raspberry Pi only)
+-  Test fixtures have been added to keep this library stable
+
+Pimoroni invests time and resources forking and modifying this open
+source code, please support Pimoroni and open-source software by
 purchasing products from us, too!
 
 Adafruit invests time and resources providing this open source code,
