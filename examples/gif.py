@@ -36,7 +36,7 @@ HEIGHT = ST7735.ST7735_TFTHEIGHT
 disp = ST7735.ST7735(
     port=0,
     cs=0,
-    dc=24,
+    dc=9,
     backlight=18,
     spi_speed_hz=4000000
 )
