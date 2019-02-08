@@ -58,6 +58,6 @@ while True:
         disp.display(image.resize((WIDTH, HEIGHT)))
         frame += 1
         time.sleep(0.05)
+
     except EOFError:
         frame = 0
-    

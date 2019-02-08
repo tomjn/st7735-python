@@ -19,14 +19,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 import time
-import sys
 import math
 
 from PIL import Image
 from PIL import ImageDraw
 import ST7735 as ST7735
 
-SPI_SPEED_MHZ = 10 # Higher speed = higher framerate
+SPI_SPEED_MHZ = 10  # Higher speed = higher framerate
 
 # Create ST7735 LCD display class.
 disp = ST7735.ST7735(
@@ -66,4 +65,7 @@ while True:
     count += 1
     time_current = time.time() - time_start
     if count % 120 == 0:
-        print("Time: {}, Frames: {}, FPS: {}".format(time_current, count, count / time_current))
+        print("Time: {}, Frames: {}, FPS: {}".format(
+            time_current,
+            count,
+            count / time_current))
