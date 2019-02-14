@@ -176,8 +176,12 @@ class ST7735(object):
         GPIO.setup(dc, GPIO.OUT)
 
         # Setup backlight as output (if provided).
+        self._backlight = backlight
         if backlight is not None:
-            GPIO.setup(backlight, GPIO.OUT)
+            GPIO.setup(sbacklight, GPIO.OUT, pull_up_down=GPIO.PUD_UP)
+            GPIO.output(backlight, GPIO.LOW)
+            time.sleep(0.1)
+            GPIO.output(backlight, GPIO.HIGH)
 
         # Setup reset as output (if provided).
         if rst is not None:
@@ -201,6 +205,11 @@ class ST7735(object):
         for start in range(0, len(data), chunk_size):
             end = min(start + chunk_size, len(data))
             self._spi.xfer(data[start:end])
+
+    def set_backlight(self, value):
+        """Set the backlight on/off."""
+        if self._backlight is not None:
+            GPIO.output(self._backlight, value)
 
     @property
     def width(self):
