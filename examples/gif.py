@@ -29,9 +29,6 @@ else:
     print("Usage: {} <filename.gif>".format(sys.argv[0]))
     sys.exit(0)
 
-WIDTH = ST7735.ST7735_TFTWIDTH
-HEIGHT = ST7735.ST7735_TFTHEIGHT
-
 # Create TFT LCD display class.
 disp = ST7735.ST7735(
     port=0,
@@ -44,6 +41,9 @@ disp = ST7735.ST7735(
 # Initialize display.
 disp.begin()
 
+width = disp.width
+height = disp.height
+
 # Load an image.
 print('Loading gif: {}...'.format(image_file))
 image = Image.open(image_file)
@@ -55,7 +55,7 @@ frame = 0
 while True:
     try:
         image.seek(frame)
-        disp.display(image.resize((WIDTH, HEIGHT)))
+        disp.display(image.resize((width, height)))
         frame += 1
         time.sleep(0.05)
 
