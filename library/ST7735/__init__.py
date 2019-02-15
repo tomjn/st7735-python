@@ -178,7 +178,7 @@ class ST7735(object):
         # Setup backlight as output (if provided).
         self._backlight = backlight
         if backlight is not None:
-            GPIO.setup(sbacklight, GPIO.OUT, pull_up_down=GPIO.PUD_UP)
+            GPIO.setup(backlight, GPIO.OUT)
             GPIO.output(backlight, GPIO.LOW)
             time.sleep(0.1)
             GPIO.output(backlight, GPIO.HIGH)
