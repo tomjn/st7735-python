@@ -23,6 +23,13 @@ import ST7735
 import time
 import sys
 
+print("""
+gif.py - Display a gif on the LCD.
+
+If you're using Breakout Garden, plug the 0.96" LCD (SPI)
+breakout into the rear slot.
+""")
+
 if len(sys.argv) > 1:
     image_file = sys.argv[1]
 else:

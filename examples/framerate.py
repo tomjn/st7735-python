@@ -20,12 +20,25 @@
 # THE SOFTWARE.
 import time
 import math
+import sys
 
 from PIL import Image
 from PIL import ImageDraw
 import ST7735 as ST7735
 
 SPI_SPEED_MHZ = 10  # Higher speed = higher framerate
+
+if len(sys.argv) > 1:
+    SPI_SPEED_MHZ = int(sys.argv[1])
+
+print("""
+framerate.py - Test LCD framerate.
+
+If you're using Breakout Garden, plug the 0.96" LCD (SPI)
+breakout into the rear slot.
+
+Running at: {}MHz
+""".format(SPI_SPEED_MHZ))
 
 # Create ST7735 LCD display class.
 disp = ST7735.ST7735(
@@ -34,7 +47,7 @@ disp = ST7735.ST7735(
     dc=9,
     backlight=18,
     rotation=90,
-    spi_speed_hz=10 * 1000000
+    spi_speed_hz=SPI_SPEED_MHZ * 1000000
 )
 
 WIDTH = disp.width
@@ -65,7 +78,7 @@ while True:
     count += 1
     time_current = time.time() - time_start
     if count % 120 == 0:
-        print("Time: {}, Frames: {}, FPS: {}".format(
+        print("Time: {:8.3f},      Frames: {:6d},      FPS: {:8.3f}".format(
             time_current,
             count,
             count / time_current))
