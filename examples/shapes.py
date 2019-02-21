@@ -24,6 +24,13 @@ from PIL import ImageFont
 
 import ST7735
 
+print("""
+shapes.py - Display test shapes on the LCD using PIL.
+
+If you're using Breakout Garden, plug the 0.96" LCD (SPI)
+breakout into the rear slot.
+
+""")
 
 # Create ST7735 LCD display class.
 disp = ST7735.ST7735(

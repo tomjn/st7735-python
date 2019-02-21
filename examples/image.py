@@ -23,6 +23,13 @@ import sys
 from PIL import Image
 import ST7735 as ST7735
 
+print("""
+image.py - Display an image on the LCD.
+
+If you're using Breakout Garden, plug the 0.96" LCD (SPI)
+breakout into the rear slot.
+""")
+
 if len(sys.argv) < 2:
     print("Usage: {} <image_file>".format(sys.argv[0]))
     sys.exit(1)
@@ -41,8 +48,6 @@ disp = ST7735.ST7735(
 
 WIDTH = disp.width
 HEIGHT = disp.height
-
-print(WIDTH, HEIGHT)
 
 # Initialize display.
 disp.begin()
