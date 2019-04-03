@@ -1,3 +1,11 @@
+0.0.3
+-----
+
+* Fixed backlight pin
+* Added `set_backlight`
+* Added constants BG_SPI_CS_FRONT and BG_SPI_CS_BACK
+* Added module __version__
+
 0.0.2
 -----
 
