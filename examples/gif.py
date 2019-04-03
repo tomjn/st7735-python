@@ -39,7 +39,7 @@ else:
 # Create TFT LCD display class.
 disp = ST7735.ST7735(
     port=0,
-    cs=0,
+    cs=ST7735.BG_SPI_CS_FRONT,
     dc=9,
     backlight=18,
     spi_speed_hz=4000000
