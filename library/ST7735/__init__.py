@@ -26,6 +26,9 @@ import spidev
 import RPi.GPIO as GPIO
 
 
+BG_SPI_CS_BACK = 0
+BG_SPI_CS_FRONT = 1
+
 SPI_CLOCK_HZ = 16000000
 
 # Constants for interacting with display registers.
