@@ -35,9 +35,9 @@ breakout into the rear slot.
 # Create ST7735 LCD display class.
 disp = ST7735.ST7735(
     port=0,
-    cs=ST7735.BG_SPI_CS_FRONT,
+    cs=ST7735.BG_SPI_CS_FRONT,  # BG_SPI_CSB_BACK or BG_SPI_CS_FRONT
     dc=9,
-    backlight=18,
+    backlight=19,               # 18 for back BG slot, 19 for front BG slot.
     rotation=90,
     spi_speed_hz=4000000
 )
