@@ -19,4 +19,5 @@ setup(name='ST7735',
       author_email='phil@pimoroni.com',
       classifiers=classifiers,
       url='https://github.com/pimoroni/st7735-160x80-python/',
-      packages=find_packages())
+      packages=find_packages(),
+      install_requires=['spidev>=3.4'])
