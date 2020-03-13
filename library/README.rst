@@ -1,7 +1,11 @@
 Python ST7735
 =============
 
-|Build Status| |Coverage Status| |PyPi Package| |Python Versions|
+`Build Status <https://travis-ci.com/pimoroni/st7735-python>`__
+`Coverage
+Status <https://coveralls.io/github/pimoroni/st7735-python?branch=master>`__
+`PyPi Package <https://pypi.python.org/pypi/st7735>`__ `Python
+Versions <https://pypi.python.org/pypi/st7735>`__
 
 Python library to control an ST7735 TFT LCD display. Allows simple
 drawing on the display without installing a kernel module.
@@ -13,14 +17,14 @@ Make sure you have the following dependencies:
 
 ::
 
-    sudo apt-get update
-    sudo apt-get install python-rpi.gpio python-spidev python-pip python-imaging python-numpy
+   sudo apt-get update
+   sudo apt-get install python-rpi.gpio python-spidev python-pip python-imaging python-numpy
 
 Install this library by running:
 
 ::
 
-    sudo pip install st7735
+   sudo pip install st7735
 
 See example of usage in the examples folder.
 
@@ -56,16 +60,7 @@ Adafruit invests time and resources providing this open source code,
 please support Adafruit and open-source hardware by purchasing products
 from Adafruit!
 
-Modified from 'Modified from 'Adafruit Python ILI9341' written by Tony
-DiCola for Adafruit Industries.' written by Clement Skau.
+Modified from ‘Modified from ’Adafruit Python ILI9341’ written by Tony
+DiCola for Adafruit Industries.’ written by Clement Skau.
 
 MIT license, all text above must be included in any redistribution
-
-.. |Build Status| image:: https://travis-ci.com/pimoroni/st7735-python.svg?branch=master
-   :target: https://travis-ci.com/pimoroni/st7735-python
-.. |Coverage Status| image:: https://coveralls.io/repos/github/pimoroni/st7735-python/badge.svg?branch=master
-   :target: https://coveralls.io/github/pimoroni/st7735-python?branch=master
-.. |PyPi Package| image:: https://img.shields.io/pypi/v/st7735.svg
-   :target: https://pypi.python.org/pypi/st7735
-.. |Python Versions| image:: https://img.shields.io/pypi/pyversions/st7735.svg
-   :target: https://pypi.python.org/pypi/st7735

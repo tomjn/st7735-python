@@ -1,3 +1,10 @@
+0.0.4
+-----
+
+* Depend upon spidev==3.4.0 for stability fixes
+* Switch from manual data chunking to spidev.xfer3()
+
+
 0.0.3
 -----
 

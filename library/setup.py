@@ -11,7 +11,7 @@ classifiers = ['Development Status :: 4 - Beta',
                'Topic :: System :: Hardware']
 
 setup(name='ST7735',
-      version='0.0.3',
+      version='0.0.4',
       description='Library to control an ST7735 168x80 TFT LCD display.',
       long_description=open('README.rst').read() + '\n' + open('CHANGELOG.txt').read(),
       license='MIT',
