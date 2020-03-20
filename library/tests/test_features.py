@@ -1,4 +1,3 @@
-import sys
 import mock
 from tools import force_reimport
 
