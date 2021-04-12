@@ -10,17 +10,36 @@ Python library to control an ST7735 TFT LCD display. Allows simple drawing on th
 
 Designed specifically to work with a ST7735 based 160x80 pixel TFT SPI display. (Specifically the 0.96" SPI LCD from Pimoroni).
 
+## Installing
+
+### Python 2
+
 Make sure you have the following dependencies:
 
 ````
-sudo apt-get update
-sudo apt-get install python-rpi.gpio python-spidev python-pip python-imaging python-numpy
+sudo apt update
+sudo apt install python-rpi.gpio python-spidev python-pip python-pil python-numpy
 ````
 
 Install this library by running:
 
 ````
 sudo pip install st7735
+````
+
+### Python 3
+
+Make sure you have the following dependencies:
+
+````
+sudo apt update
+sudo apt install python3-rpi.gpio python3-spidev python3-pip python3-pil python3-numpy
+````
+
+Install this library by running:
+
+````
+sudo python3 -m pip install st7735
 ````
 
 See example of usage in the examples folder.
