@@ -67,6 +67,13 @@ Modified from 'Modified from 'Adafruit Python ILI9341' written by Tony DiCola fo
 MIT license, all text above must be included in any redistribution
 
 # Changelog
+0.0.4-post1
+-----------
+
+* Repackage with Markdown README/setup.cfg
+* Fix `__version__` to 0.0.4
+* Update dependencies in README
+
 0.0.4
 -----
 
@@ -80,7 +87,7 @@ MIT license, all text above must be included in any redistribution
 * Fixed backlight pin
 * Added `set_backlight`
 * Added constants BG_SPI_CS_FRONT and BG_SPI_CS_BACK
-* Added module __version__
+* Added module `__version__`
 
 0.0.2
 -----
