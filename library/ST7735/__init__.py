@@ -98,19 +98,23 @@ ST7735_MAGENTA = 0xF81F  # 0b 11111 000000 11111
 ST7735_YELLOW = 0xFFE0  # 0b 11111 111111 00000
 ST7735_WHITE = 0xFFFF  # 0b 11111 111111 11111
 
+# Rotation modes
+ST7735_MADCTL_MY = 0x80
+ST7735_MADCTL_MX = 0x40
+ST7735_MADCTL_MV = 0x20
+ST7735_MADCTL_ROTATIONS = {
+    0: 0,
+    90: ST7735_MADCTL_MX | ST7735_MADCTL_MV,
+    180: ST7735_MADCTL_MY | ST7735_MADCTL_MX,
+    270: ST7735_MADCTL_MY | ST7735_MADCTL_MV,
+}
 
-def color565(r, g, b):
-    """Convert red, green, blue components to a 16-bit 565 RGB value. Components
-    should be values 0 to 255.
-    """
-    return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
 
-
-def image_to_data(image, rotation=0):
+def image_to_data(image):
     """Generator function to convert a PIL image to 16-bit 565 RGB bytes."""
     # NumPy is much faster at doing this. NumPy code provided by:
     # Keith (https://www.blogger.com/profile/02555547344016007163)
-    pb = np.rot90(np.array(image.convert('RGB')), rotation // 90).astype('uint16')
+    pb = np.array(image.convert('RGB')).astype('uint16')
     color = ((pb[:, :, 0] & 0xF8) << 8) | ((pb[:, :, 1] & 0xFC) << 3) | (pb[:, :, 2] >> 3)
     return np.dstack(((color >> 8) & 0xFF, color & 0xFF)).flatten().tolist()
 
@@ -119,7 +123,8 @@ class ST7735(object):
     """Representation of an ST7735 TFT LCD."""
 
     def __init__(self, port, cs, dc, backlight=None, rst=None, width=ST7735_TFTWIDTH,
-                 height=ST7735_TFTHEIGHT, rotation=90, offset_left=None, offset_top=None, invert=True, spi_speed_hz=4000000):
+            height=ST7735_TFTHEIGHT, rotation=90, mirror=False, offset_left=None,
+            offset_top=None, invert=True, spi_speed_hz=4000000):
         """Create an instance of the display using SPI communication.
 
         Must provide the GPIO pin number for the D/C pin and the SPI driver.
@@ -133,6 +138,7 @@ class ST7735(object):
         :param width: Width of display connected to ST7735
         :param height: Height of display connected to ST7735
         :param rotation: Rotation of display connected to ST7735
+        :param mirror: Mirror of display connected to ST7735
         :param offset_left: COL offset in ST7735 memory
         :param offset_top: ROW offset in ST7735 memory
         :param invert: Invert display
@@ -153,6 +159,7 @@ class ST7735(object):
         self._width = width
         self._height = height
         self._rotation = rotation
+        self._mirror = mirror
         self._invert = invert
 
         # Default left offset to center display
@@ -285,7 +292,10 @@ class ST7735(object):
             self.command(ST7735_INVOFF)  # Don't invert display
 
         self.command(ST7735_MADCTL)     # Memory access control (directions)
-        self.data(0xC8)                 # row addr/col addr, bottom to top refresh
+        madctl = ST7735_MADCTL_ROTATIONS[self._rotation] | 0x08 # rgb
+        if self._mirror:
+            madctl ^= ST7735_MADCTL_MX
+        self.data(madctl)
 
         self.command(ST7735_COLMOD)     # set color mode
         self.data(0x05)                 # 16-bit color
@@ -371,16 +381,23 @@ class ST7735(object):
         x0 += self._offset_left
         x1 += self._offset_left
 
+        if self._rotation % 180:
+            r0, r1 = x0, x1
+            c0, c1 = y0, y1
+        else:
+            c0, c1 = x0, x1
+            r0, r1 = y0, y1
+
         self.command(ST7735_CASET)       # Column addr set
-        self.data(x0 >> 8)
-        self.data(x0)                    # XSTART
-        self.data(x1 >> 8)
-        self.data(x1)                    # XEND
+        self.data(c0 >> 8)
+        self.data(c0)                    # COLSTART
+        self.data(c1 >> 8)
+        self.data(c1)                    # COLEND
         self.command(ST7735_RASET)       # Row addr set
-        self.data(y0 >> 8)
-        self.data(y0)                    # YSTART
-        self.data(y1 >> 8)
-        self.data(y1)                    # YEND
+        self.data(r0 >> 8)
+        self.data(r0)                    # ROWSTART
+        self.data(r1 >> 8)
+        self.data(r1)                    # ROWEND
         self.command(ST7735_RAMWR)       # write to RAM
 
     def display(self, image):
@@ -395,6 +412,6 @@ class ST7735(object):
         # Unfortunate that this copy has to occur, but the SPI byte writing
         # function needs to take an array of bytes and PIL doesn't natively
         # store images in 16-bit 565 RGB format.
-        pixelbytes = list(image_to_data(image, self._rotation))
+        pixelbytes = list(image_to_data(image))
         # Write data to hardware.
         self.data(pixelbytes)
