@@ -123,8 +123,8 @@ class ST7735(object):
     """Representation of an ST7735 TFT LCD."""
 
     def __init__(self, port, cs, dc, backlight=None, rst=None, width=ST7735_TFTWIDTH,
-            height=ST7735_TFTHEIGHT, rotation=90, mirror=False, offset_left=None,
-            offset_top=None, invert=True, spi_speed_hz=4000000):
+                height=ST7735_TFTHEIGHT, rotation=90, mirror=False, offset_left=None,
+                offset_top=None, invert=True, spi_speed_hz=4000000):
         """Create an instance of the display using SPI communication.
 
         Must provide the GPIO pin number for the D/C pin and the SPI driver.
@@ -292,7 +292,7 @@ class ST7735(object):
             self.command(ST7735_INVOFF)  # Don't invert display
 
         self.command(ST7735_MADCTL)     # Memory access control (directions)
-        madctl = ST7735_MADCTL_ROTATIONS[self._rotation] | 0x08 # rgb
+        madctl = ST7735_MADCTL_ROTATIONS[self._rotation] | 0x08     # rgb
         if self._mirror:
             madctl ^= ST7735_MADCTL_MX
         self.data(madctl)
