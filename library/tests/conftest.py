@@ -8,6 +8,13 @@ import pytest
 
 
 @pytest.fixture(scope='function', autouse=False)
+def ST7735():
+    import ST7735
+    yield ST7735
+    del sys.modules['ST7735']
+
+
+@pytest.fixture(scope='function', autouse=False)
 def GPIO():
     """Mock RPi.GPIO module."""
     GPIO = mock.MagicMock()
@@ -32,7 +39,5 @@ def spidev():
 @pytest.fixture(scope='function', autouse=False)
 def numpy():
     """Mock numpy module."""
-    numpy = mock.MagicMock()
-    sys.modules['numpy'] = numpy
+    import numpy
     yield numpy
-    del sys.modules['numpy']
