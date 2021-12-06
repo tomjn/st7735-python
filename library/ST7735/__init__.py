@@ -119,9 +119,9 @@ def image_to_data(image):
         pb = image
 
     # Mask and shift the 888 RGB into 565 RGB
-    red   = (pb[..., [0]] & 0xF8) << 8
+    red = (pb[..., [0]] & 0xF8) << 8
     green = (pb[..., [1]] & 0xFC) << 3
-    blue  = (pb[..., [2]] & 0xF8) >> 3
+    blue = (pb[..., [2]] & 0xF8) >> 3
 
     # Stick 'em together
     result = red | green | blue
