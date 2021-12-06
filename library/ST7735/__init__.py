@@ -111,12 +111,23 @@ ST7735_MADCTL_ROTATIONS = {
 
 
 def image_to_data(image):
-    """Generator function to convert a PIL image to 16-bit 565 RGB bytes."""
-    # NumPy is much faster at doing this. NumPy code provided by:
-    # Keith (https://www.blogger.com/profile/02555547344016007163)
-    pb = np.array(image.convert('RGB')).astype('uint16')
-    color = ((pb[:, :, 0] & 0xF8) << 8) | ((pb[:, :, 1] & 0xFC) << 3) | (pb[:, :, 2] >> 3)
-    return np.dstack(((color >> 8) & 0xFF, color & 0xFF)).flatten().tolist()
+    if not isinstance(image, np.ndarray):
+        pb = np.array(image.convert('RGB'), dtype='uint16')
+    elif image.dtype != 'uint16':
+        pb = image.astype('uint16')
+    else:
+        pb = image
+
+    # Mask and shift the 888 RGB into 565 RGB
+    red   = (pb[..., [0]] & 0xF8) << 8
+    green = (pb[..., [1]] & 0xFC) << 3
+    blue  = (pb[..., [2]] & 0xF8) >> 3
+
+    # Stick 'em together
+    result = red | green | blue
+
+    # Output the raw bytes
+    return result.byteswap().tobytes()
 
 
 class ST7735(object):
