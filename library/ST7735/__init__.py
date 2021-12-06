@@ -112,7 +112,9 @@ ST7735_MADCTL_ROTATIONS = {
 
 def image_to_data(image):
     if not isinstance(image, np.ndarray):
-        pb = np.array(image.convert('RGB'), dtype='uint16')
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+        pb = np.array(image, dtype='uint16')
     elif image.dtype != 'uint16':
         pb = image.astype('uint16')
     else:
@@ -412,17 +414,25 @@ class ST7735(object):
         self.command(ST7735_RAMWR)       # write to RAM
 
     def display(self, image):
-        """Write the provided image to the hardware.
+        """Write the provided image to the hardware. image could be a PIL image,
+        a numpy array or raw data. If image is a PIL image it must be the same
+        dimensions as the display hardware. If image is a numpy array it must be
+        shape (width, height, 3). If the image is raw data it could be a bytes
+        string or a uint8 list both of width*height*2 length of RGB565 colors
+        encoded in big-endian format.
 
-        :param image: Should be RGB format and the same dimensions as the display hardware.
+        :param image: Should the same dimensions as the display hardware.
 
         """
         # Set address bounds to entire display.
         self.set_window()
-        # Convert image to array of 16bit 565 RGB data bytes.
-        # Unfortunate that this copy has to occur, but the SPI byte writing
-        # function needs to take an array of bytes and PIL doesn't natively
-        # store images in 16-bit 565 RGB format.
-        pixelbytes = list(image_to_data(image))
+
+        if not isinstance(image, (list, bytes)):
+            # Convert image to array of 16bit 565 RGB data bytes.
+            # Unfortunate that this copy has to occur, but the SPI byte writing
+            # function needs to take an array of bytes and PIL doesn't natively
+            # store images in 16-bit 565 RGB format.
+            image = image_to_data(image)
+
         # Write data to hardware.
-        self.data(pixelbytes)
+        self.data(image)
