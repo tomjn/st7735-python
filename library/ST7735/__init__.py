@@ -204,10 +204,10 @@ class ST7735(object):
             GPIO.output(self._backlight, value)
 
     def display_off(self):
-        self.command(ST7735_DISPOFF)     # Display on
+        self.command(ST7735_DISPOFF)
 
     def display_on(self):
-        self.command(ST7735_DISPON)     # Display on
+        self.command(ST7735_DISPON)
 
     def sleep(self):
         self.command(ST7735_SLPIN)
